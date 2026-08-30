@@ -24,8 +24,12 @@ VER_PHP_URL = "https://version.ggwhitehawk.com/live/ver.php"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PORT = int(os.environ.get('PORT', 10000))
 
-ADMIN_USER = "LEOMODZ"
-ADMIN_PASS = "DEVKKM"
+ADMIN_USER = "DADDYPRASHANT"
+ADMIN_PASS = "HIMANSHU186"
+
+# Login do dono (painel /dashboard)
+DONO_USER = "LEOMODZ"
+DONO_PASS = "DONO1"
 
 # Data file paths
 DATA_FILE = os.path.join(BASE_DIR, "crx_data.json")
@@ -38,10 +42,10 @@ key_expiry = {}
 DEFAULT_CONFIG = {
     "HS_NECK": False,
     "HS_CHEST": False,
-    "BYPASSV1": True,
-    "BACKJUMPV1": True,
-    "HIGH_SENSI": True,
-    "ZIG_ZAG_MOVE": True
+    "BYPASSV1": False,
+    "BACKJUMPV1": False,
+    "HIGH_SENSI": False,
+    "ZIG_ZAG_MOVE": False
 }
 
 ANTI_BAN_OVERRIDES = {
@@ -466,20 +470,31 @@ def api_ip_check():
         "expires": key_expiry.get(client_ip, "").isoformat() if client_ip in key_expiry else None
     })
 
+# ============ LEO MDZ LOGIN SYSTEM (DONO) ============
+
 @app.route('/')
 def landing():
-    return render_template_string(LANDING_PAGE)
+    return render_template_string(LANDING_PAGE, error=None)
+
+@app.route('/dono/login', methods=['POST'])
+def dono_login():
+    username = request.form.get('username', '').strip().upper()
+    password = request.form.get('password', '').strip().upper()
+    if username == DONO_USER and password == DONO_PASS:
+        session['dono_logged'] = True
+        return redirect(url_for('dashboard'))
+    return render_template_string(LANDING_PAGE, error="USUÁRIO OU SENHA INCORRETOS")
 
 @app.route('/dashboard')
 def dashboard():
-    if not session.get('unlocked'):
+    if not session.get('dono_logged'):
         return redirect(url_for('landing'))
     return render_template_string(DASHBOARD_PAGE)
 
-@app.route('/unlock', methods=['POST'])
-def unlock():
-    session['unlocked'] = True
-    return jsonify({'success': True})
+@app.route('/dono/logout')
+def dono_logout():
+    session.pop('dono_logged', None)
+    return redirect(url_for('landing'))
 
 # ==================== HTML TEMPLATES ====================
 
@@ -491,6 +506,7 @@ LOGIN_PAGE = """<!DOCTYPE html>
     <title>LEO MDZ · ADMINISTRADOR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#07070d;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Poppins','Segoe UI',sans-serif;overflow:hidden}
@@ -531,7 +547,6 @@ LOGIN_PAGE = """<!DOCTYPE html>
         </form>
         <div class="footer">SEGURO</div>
     </div>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </body>
 </html>"""
 
@@ -658,69 +673,50 @@ LANDING_PAGE = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEO MDZ · DESBLOQUEAR</title>
+    <title>LEO MDZ · LOGIN SYSTEM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#07070d;font-family:'Poppins','Segoe UI',sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;position:relative;overflow:hidden}
+        body{background:#07070d;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Poppins','Segoe UI',sans-serif;overflow:hidden}
         .aurora{position:fixed;inset:0;z-index:0;overflow:hidden}
-        .aurora span{position:absolute;border-radius:50%;filter:blur(90px);opacity:.16;animation:float 14s ease-in-out infinite}
+        .aurora span{position:absolute;border-radius:50%;filter:blur(90px);opacity:.18;animation:float 14s ease-in-out infinite}
         .aurora span:nth-child(1){width:420px;height:420px;background:#7c3aed;top:-120px;left:-100px}
         .aurora span:nth-child(2){width:380px;height:380px;background:#ec4899;bottom:-120px;right:-80px;animation-delay:-7s}
         @keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.15)}}
-        .container{max-width:400px;width:100%;background:rgba(15,15,26,0.88);backdrop-filter:blur(32px);border-radius:28px;padding:44px 36px;border:1px solid rgba(255,255,255,0.07);box-shadow:0 48px 96px rgba(0,0,0,0.9);position:relative;z-index:1}
-        .brand{text-align:center;margin-bottom:32px}
-        .brand .icon{width:56px;height:56px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:24px;margin-bottom:12px;box-shadow:0 12px 32px rgba(139,92,246,0.35)}
-        .brand h1{color:#fff;font-size:22px;font-weight:300;letter-spacing:4px;text-transform:uppercase}
+        .container{position:relative;z-index:1;background:rgba(15,15,26,0.88);backdrop-filter:blur(28px);border-radius:28px;padding:48px 44px;width:100%;max-width:410px;border:1px solid rgba(255,255,255,0.07);box-shadow:0 48px 96px rgba(0,0,0,0.8)}
+        .brand{text-align:center;margin-bottom:36px}
+        .brand .icon{width:60px;height:60px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:24px;margin-bottom:14px;box-shadow:0 12px 32px rgba(139,92,246,0.35)}
+        .brand h1{color:#fff;font-size:24px;font-weight:300;letter-spacing:4px;text-transform:uppercase}
         .brand h1 span{color:#a78bfa;font-weight:700}
-        .brand p{color:rgba(255,255,255,0.15);font-size:9px;letter-spacing:3px;margin-top:4px;text-transform:uppercase}
-        .step-status{display:flex;justify-content:center;gap:30px;margin:10px 0 20px 0;font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;font-weight:600;letter-spacing:1px}
-        .step-status .done{color:#34d399}
-        .social-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:600;text-decoration:none;transition:0.3s;margin:6px 0;font-family:inherit;text-transform:uppercase;letter-spacing:1px}
-        .social-btn.youtube{background:linear-gradient(135deg,#ff0000,#cc0000)}
-        .social-btn.youtube:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,0,0,0.35)}
-        .social-btn.telegram{background:linear-gradient(135deg,#0088cc,#006699)}
-        .social-btn.telegram:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,136,204,0.35)}
-        .note{text-align:center;color:rgba(255,255,255,0.25);font-size:10px;margin:8px 0 14px 0;letter-spacing:0.5px;text-transform:uppercase;font-weight:500}
-        .unlock-btn{width:100%;padding:16px;background:linear-gradient(135deg,#34d399,#22d3ee);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:0.3s;margin-top:4px;font-family:inherit;text-transform:uppercase}
-        .unlock-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(52,211,153,0.35)}
-        .unlock-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none}
-        .footer{text-align:center;margin-top:24px;color:rgba(255,255,255,0.08);font-size:8px;letter-spacing:3px;text-transform:uppercase}
+        .brand p{color:rgba(255,255,255,0.18);font-size:10px;letter-spacing:3px;margin-top:6px;text-transform:uppercase}
+        .field{margin-bottom:18px}
+        .field label{display:block;color:rgba(255,255,255,0.3);font-size:10px;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;font-weight:600}
+        .field input{width:100%;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;color:#fff;font-size:15px;transition:0.3s;outline:none;font-family:inherit}
+        .field input:focus{border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.05);box-shadow:0 0 0 4px rgba(139,92,246,0.08)}
+        .btn{width:100%;padding:16px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:600;letter-spacing:2px;cursor:pointer;transition:0.3s;font-family:inherit;text-transform:uppercase}
+        .btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(139,92,246,0.35)}
+        .error{color:#f87171;font-size:12px;text-align:center;margin-top:14px;padding:10px;background:rgba(239,68,68,0.06);border-radius:8px;border:1px solid rgba(239,68,68,0.15);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+        .footer{text-align:center;margin-top:24px;color:rgba(255,255,255,0.08);font-size:9px;letter-spacing:3px;text-transform:uppercase}
     </style>
 </head>
 <body>
     <div class="aurora"><span></span><span></span></div>
     <div class="container">
         <div class="brand">
-            <div class="icon"><i class="fas fa-unlock-alt"></i></div>
-            <h1>LEO <span>MDZ</span></h1>
-            <p>CRIADOR @LEO MODZ</p>
+            <div class="icon"><i class="fas fa-lock"></i></div>
+            <h1>LEO MDZ <span>LOGIN SYSTEM</span></h1>
+            <p>ACESSO RESTRITO AO DONO</p>
         </div>
-        <div class="step-status">
-            <span id="ytStatus"><i class="fab fa-youtube"></i> YOUTUBE</span>
-            <span id="tgStatus"><i class="fab fa-telegram"></i> TELEGRAM</span>
-        </div>
-        <a href="https://youtube.com/@leomodzofc1?si=iOWwXPqx455mXrb_" target="_blank" class="social-btn youtube" onclick="markYouTube()">
-            <i class="fab fa-youtube"></i> INSCREVA-SE PARA CONTINUAR
-        </a>
-        <a href="https://t.me/LEOMDZALLSRCLEAKISBACK" target="_blank" class="social-btn telegram" onclick="markTelegram()">
-            <i class="fab fa-telegram-plane"></i> ENTRE NO TG PARA CONTINUAR
-        </a>
-        <div class="note">INSCREVA-SE E ENTRE NO TG PARA CONTINUAR.</div>
-        <button class="unlock-btn" id="unlockBtn" disabled onclick="unlockProxy()">
-            <i class="fas fa-arrow-right"></i> TOQUE PARA CONTINUAR
-        </button>
+        <form method="POST" action="/dono/login">
+            <div class="field"><label>USUÁRIO</label><input type="text" name="username" placeholder="DIGITE O USUÁRIO" required autocomplete="off"></div>
+            <div class="field"><label>SENHA</label><input type="password" name="password" placeholder="DIGITE A SENHA" required></div>
+            <button type="submit" class="btn"><i class="fas fa-right-to-bracket" style="margin-right:8px;"></i>ENTRAR</button>
+            {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        </form>
         <div class="footer">SEGURO</div>
     </div>
-    <script>
-        let ytClicked=false;let tgClicked=false;
-        function markYouTube(){ytClicked=true;document.getElementById('ytStatus').className='done';document.getElementById('ytStatus').innerHTML='<i class="fab fa-youtube"></i> ✓ YOUTUBE';checkUnlock();}
-        function markTelegram(){tgClicked=true;document.getElementById('tgStatus').className='done';document.getElementById('tgStatus').innerHTML='<i class="fab fa-telegram"></i> ✓ TELEGRAM';checkUnlock();}
-        function checkUnlock(){if(ytClicked&&tgClicked){document.getElementById('unlockBtn').disabled=false;}}
-        function unlockProxy(){if(!ytClicked||!tgClicked)return;fetch('/unlock',{method:'POST'}).then(r=>r.json()).then(d=>{if(d.success){window.location.href='/dashboard';}});}
-    </script>
 </body>
 </html>"""
 
@@ -770,6 +766,8 @@ DASHBOARD_PAGE = """<!DOCTYPE html>
         .note-box{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:12px 14px;margin-top:12px;color:rgba(255,255,255,0.35);font-size:11px;text-align:center;line-height:1.5;text-transform:uppercase;font-weight:500}
         .note-box a{color:#a78bfa;text-decoration:none;word-break:break-all}
         .note-box a:hover{text-decoration:underline}
+        .logout-btn{display:inline-flex;align-items:center;gap:8px;margin-top:14px;width:100%;padding:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:12px;color:#f87171;font-size:12px;font-weight:600;text-decoration:none;justify-content:center;transition:0.3s;text-transform:uppercase;letter-spacing:1px}
+        .logout-btn:hover{background:rgba(239,68,68,0.12)}
         .footer{text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.04)}
         .footer-text{color:rgba(255,255,255,0.15);font-size:8px;letter-spacing:3px;font-weight:700;text-transform:uppercase}
         .footer-text span{background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -797,7 +795,7 @@ DASHBOARD_PAGE = """<!DOCTYPE html>
         <div class="ip-bar">
             <i class="fas fa-network-wired"></i>
             <span class="ip" id="ipDisplay">CARREGANDO...</span>
-            <span class="tag"><i class="fas fa-check-circle"></i> DESBLOQUEADO</span>
+            <span class="tag"><i class="fas fa-check-circle"></i> DONO</span>
         </div>
 
         <div class="section"><i class="fas fa-crosshairs"></i> MIRA</div>
@@ -843,10 +841,7 @@ DASHBOARD_PAGE = """<!DOCTYPE html>
             <a href="https://leomdzproxy-production.up.railway.app" target="_blank">https://leomdzproxy-production.up.railway.app</a>
         </div>
 
-        <div class="social-footer">
-            <a href="https://youtube.com/@leomodzofc1?si=iOWwXPqx455mXrb_" target="_blank"><i class="fab fa-youtube"></i></a>
-            <a href="https://t.me/LEOMDZALLSRCLEAKISBACK" target="_blank"><i class="fab fa-telegram"></i></a>
-        </div>
+        <a href="/dono/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> SAIR DO PAINEL</a>
 
         <div class="footer"><div class="footer-text"><span>LEO MDZ</span> · PROXY</div></div>
     </div>
