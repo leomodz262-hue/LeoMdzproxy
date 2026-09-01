@@ -1,4 +1,5 @@
 from flask import Flask
+import os
 
 app = Flask(__name__)
 
@@ -10,7 +11,7 @@ def index():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PROTEGIDO POR @LEO MODZ</title>
+        <title>PROXY DESATIVADA</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
@@ -45,4 +46,5 @@ def index():
     '''
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
