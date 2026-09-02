@@ -787,11 +787,11 @@ DASHBOARD_PAGE = """<!DOCTYPE html>
         <div class="header">
             <div class="brand">
                 <div class="brand-icon"><i class="fas fa-satellite-dish"></i></div>
-                <div class="brand-text">LEO <span>MDZ</span></div>
+                <div class="brand-text">LEO <span>MDZ PROXY</span></div>
             </div>
             <div class="status-badge">
                 <div class="status-dot"></div>
-                <div class="status-text">AO VIVO</div>
+                <div class="status-text">ONLINE</div>
             </div>
         </div>
         <div class="ip-bar">
@@ -800,19 +800,6 @@ DASHBOARD_PAGE = """<!DOCTYPE html>
             <span class="tag"><i class="fas fa-check-circle"></i> DESBLOQUEADO</span>
         </div>
 
-        <div class="section"><i class="fas fa-crosshairs"></i> MIRA</div>
-        <div class="grid">
-            <div class="item" onclick="toggle('hs_neck')">
-                <div class="ico" style="color:#a78bfa;"><i class="fas fa-crosshairs"></i></div>
-                <div class="info"><div class="name">HS PESCOÇO</div><div class="desc">HEADSHOT</div></div>
-                <div class="sw" id="sw_hs_neck"><div class="th"></div></div>
-            </div>
-            <div class="item" onclick="toggle('hs_chest')">
-                <div class="ico" style="color:#f472b6;"><i class="fas fa-bullseye"></i></div>
-                <div class="info"><div class="name">HS PEITO</div><div class="desc">PEITO</div></div>
-                <div class="sw" id="sw_hs_chest"><div class="th"></div></div>
-            </div>
-        </div>
 
         <div class="section"><i class="fas fa-sliders-h"></i> CONFIGURAÇÃO</div>
         <div class="grid">
@@ -832,7 +819,7 @@ DASHBOARD_PAGE = """<!DOCTYPE html>
         <div class="grid">
             <div class="item" onclick="toggle('zig_zag_move')">
                 <div class="ico" style="color:#34d399;"><i class="fas fa-random"></i></div>
-                <div class="info"><div class="name">ZIG ZAG</div><div class="desc">MOVIMENTO</div></div>
+                <div class="info"><div class="name">TELA PARADA</div><div class="desc">MOVIMENTO</div></div>
                 <div class="sw" id="sw_zig_zag_move"><div class="th"></div></div>
             </div>
         </div>
@@ -853,11 +840,9 @@ DASHBOARD_PAGE = """<!DOCTYPE html>
     <div class="toast" id="toast"></div>
     <script>
         const nomes = {
-            'hs_neck': 'HS PESCOÇO',
-            'hs_chest': 'HS PEITO',
             'backjump_v1': 'BACKJUMP',
             'high_sensi': 'SENSI ALTA',
-            'zig_zag_move': 'ZIG ZAG'
+            'zig_zag_move': 'TELA PARADA'
         };
         function toast(msg) {
             const t = document.getElementById('toast');
